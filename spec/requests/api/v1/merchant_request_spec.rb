@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe "Merchants API" do
-  it "sends a list of merchants" do
+  xit "sends a list of merchants" do
 
    5.times do 
     Merchant.create(
@@ -18,7 +18,7 @@ describe "Merchants API" do
 
     expect(merchants.count).to eq(5)
 
-    merchants.each do |book|
+    merchants.each do |merchant|
       expect(merchant).to have_key(:name)
       expect(merchant[:name]).to be_a(String)
     end
