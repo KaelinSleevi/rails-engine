@@ -298,6 +298,8 @@
           1,
           1,
           1,
+          1,
+          null,
           null,
           null,
           null
@@ -331,7 +333,7 @@
           null
         ]
       },
-      "/Users/kaelinsleevi/turing/3module/projects/rails-engine/app/controllers/api/v1/merchants_controller.rb": {
+      "/Users/kaelinsleevi/turing/3module/projects/rails-engine/app/controllers/api/v1/merchants/search_controller.rb": {
         "lines": [
           1,
           null,
@@ -348,6 +350,6 @@
         ]
       }
     },
-    "timestamp": 1666057082
+    "timestamp": 1666057644
   }
 }
