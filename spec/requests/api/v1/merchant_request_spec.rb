@@ -5,7 +5,7 @@ describe "Merchants API" do
 
     create_list(:merchant, 5)
 
-    get '/api/v1/merchants/search'
+    get '/api/v1/merchants'
 
     expect(response).to be_successful
 
