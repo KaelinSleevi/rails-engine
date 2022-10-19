@@ -17,6 +17,11 @@ class Api::V1::ItemsController < ApplicationController
    render status: 404
   end
  end
+
+ def destroy
+  item = Item.find(params[:id])
+  item.destroy
+ end
  
  private
 
