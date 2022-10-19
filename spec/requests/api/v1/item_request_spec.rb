@@ -14,12 +14,23 @@ describe "Items API" do
     expect(items[:data].count).to eq(5)
 
     items[:data].each do |data|
+     expect(data).to have_key(:id)
+     expect(data[:id]).to be_a(String)
 
-      expect(data).to have_key(:id)
-      expect(data[:id]).to be_a(String)
+     expect(data).to have_key(:type)
+     expect(data[:type]).to be_a(String)
 
-      expect(data).to have_key(:type)
-      expect(data[:type]).to be_a(String)
+     expect(data).to have_key(:attributes)
+     expect(data[:attributes]).to be_a(Hash)
+
+     expect(data[:attributes]).to have_key(:name)
+     expect(data[:attributes][:name]).to be_a(String)
+
+     expect(data[:attributes]).to have_key(:description)
+     expect(data[:attributes][:description]).to be_a(String)
+
+     expect(data[:attributes]).to have_key(:unit_price)
+     expect(data[:attributes][:unit_price]).to be_a(Float)
     end
   end
 
@@ -39,6 +50,18 @@ describe "Items API" do
 
     expect(item[:data]).to have_key(:type)
     expect(item[:data][:type]).to be_a(String)
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to be_a(String)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to be_a(String)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to be_a(Float)
   end
 
   it "can create a new item" do
