@@ -24,8 +24,8 @@ describe "Items API" do
   end
 
   it "can get one items by its id" do
-    id = create(:merchant).id
-  
+    id = create(:item).id
+
     get "/api/v1/items/#{id}"
   
     item = JSON.parse(response.body, symbolize_names: true)
