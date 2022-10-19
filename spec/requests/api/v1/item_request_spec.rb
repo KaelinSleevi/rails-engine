@@ -42,19 +42,22 @@ describe "Items API" do
   end
 
   it "can create a new item" do
+   merchant = create(:merchant)
+
    item_params = ({
                    name: 'Leaf Earrings',
                    description: 'its pretty and green',
-                   unit_price: 12496,
-                   merchant_id: 1
+                   unit_price: 124.96,
+                   merchant_id: merchant.id
                  })
    headers = {"CONTENT_TYPE" => "application/json"}
  
-   # We include this header to make sure that these params are passed as JSON rather than as plain text
    post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
+   
    created_item = Item.last
  
    expect(response).to be_successful
+
    expect(created_item.name).to eq(item_params[:name])
    expect(created_item.description).to eq(item_params[:description])
    expect(created_item.unit_price).to eq(item_params[:unit_price])
