@@ -14,12 +14,23 @@ describe "Items API" do
     expect(items[:data].count).to eq(5)
 
     items[:data].each do |data|
+     expect(data).to have_key(:id)
+     expect(data[:id]).to be_a(String)
 
-      expect(data).to have_key(:id)
-      expect(data[:id]).to be_a(String)
+     expect(data).to have_key(:type)
+     expect(data[:type]).to be_a(String)
 
-      expect(data).to have_key(:type)
-      expect(data[:type]).to be_a(String)
+     expect(data).to have_key(:attributes)
+     expect(data[:attributes]).to be_a(Hash)
+
+     expect(data[:attributes]).to have_key(:name)
+     expect(data[:attributes][:name]).to be_a(String)
+
+     expect(data[:attributes]).to have_key(:description)
+     expect(data[:attributes][:description]).to be_a(String)
+
+     expect(data[:attributes]).to have_key(:unit_price)
+     expect(data[:attributes][:unit_price]).to be_a(Float)
     end
   end
 
@@ -39,6 +50,18 @@ describe "Items API" do
 
     expect(item[:data]).to have_key(:type)
     expect(item[:data][:type]).to be_a(String)
+
+    expect(item[:data]).to have_key(:attributes)
+    expect(item[:data][:attributes]).to be_a(Hash)
+
+    expect(item[:data][:attributes]).to have_key(:name)
+    expect(item[:data][:attributes][:name]).to be_a(String)
+
+    expect(item[:data][:attributes]).to have_key(:description)
+    expect(item[:data][:attributes][:description]).to be_a(String)
+
+    expect(item[:data][:attributes]).to have_key(:unit_price)
+    expect(item[:data][:attributes][:unit_price]).to be_a(Float)
   end
 
   it "can create a new item" do
@@ -75,5 +98,22 @@ describe "Items API" do
   expect(response).to be_successful
   expect(Item.count).to eq(0)
   expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+ end
+
+ it 'can update an item' do
+  merchant = create(:merchant)
+  id = create(:item).id
+
+  previous_name = Item.last.name
+
+  item_params = { name: "Silver Ting" }
+  headers = {"CONTENT_TYPE" => "application/json"}
+
+  patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+  item = Item.find_by(id: id)
+
+  expect(response).to be_successful
+  expect(item.name).to_not eq(previous_name)
+  expect(item.name).to eq("Silver Ting")
  end
 end
