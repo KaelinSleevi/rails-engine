@@ -10,5 +10,4 @@ class InvoiceItem < ApplicationRecord
  validates_numericality_of :quantity
  validates_presence_of :unit_price
  validates_numericality_of :unit_price
- validates_presence_of :status
 end
