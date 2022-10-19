@@ -75,6 +75,22 @@ describe "Items API" do
     expect(item[:data][:attributes][:unit_price]).to be_a(Float)
   end
 
+  it "If the user causes an error it sends a status and error message" do
+    get "/api/v1/items/314159265359"
+ 
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.successful?).to eq(false)
+    
+    expect(response.status).to eq(404)
+
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to eq(nil)
+
+    expect(item[:data]).to have_key(:type)
+    expect(item[:data][:type]).to be_a(String)
+  end
+
   it "can create a new item" do
    merchant = create(:merchant)
 

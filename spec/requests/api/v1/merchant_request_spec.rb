@@ -57,6 +57,22 @@ describe "Merchants API" do
     expect(merchant[:data][:type]).to be_a(String)
   end
 
+  it "If the user causes an error it sends a status and error message" do
+    get "/api/v1/merchants/39792"
+ 
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.successful?).to eq(false)
+    
+    expect(response.status).to eq(404)
+
+    expect(merchant[:data]).to have_key(:id)
+    expect(merchant[:data][:id]).to eq(nil)
+
+    expect(merchant[:data]).to have_key(:type)
+    expect(merchant[:data][:type]).to be_a(String)
+  end
+
   it "sends a list of the merchant and all their items" do
     merchant = create(:merchant)
     item1 = Item.create!(name: "Leaf Earrings", description: "It's green", unit_price: 120, merchant_id: merchant.id)
