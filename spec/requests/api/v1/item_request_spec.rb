@@ -34,6 +34,17 @@ describe "Items API" do
     end
   end
 
+  it "always return an array of data, even if one or zero resources are found" do
+    get '/api/v1/items'
+
+    expect(response).to be_successful
+
+    items = JSON.parse(response.body, symbolize_names: true)
+
+    expect(items[:data].count).to eq(0)
+    expect(items[:data]).to eq([])
+  end
+
   it "can get one items by its id" do
     id = create(:item).id
 
