@@ -116,4 +116,30 @@ describe "Items API" do
   expect(item.name).to_not eq(previous_name)
   expect(item.name).to eq("Silver Ting")
  end
+
+ it "sends a list of the item and all its merchants" do
+  item = create(:item)
+  merchant1 = Merchant.create!(name: "Keanu Reeves")
+  merchant2 = Merchant.create!(name: "Boba Fett") 
+  merchant3 = Merchant.create!(name: "Nick Miller")
+
+  get "/api/v1/items/#{item.id}/merchants"
+
+  expect(response).to be_successful
+
+  items = JSON.parse(response.body, symbolize_names: true)
+  
+  expect(items[:data].count).to eq(4)
+
+    merchants[:data].each do |data|
+      expect(data[:attributes]).to have_key(:name)
+      expect(data[:attributes][:name]).to be_a(String)
+
+      expect(data).to have_key(:id)
+      expect(data[:id]).to be_a(String)
+
+      expect(data).to have_key(:type)
+      expect(data[:type]).to be_a(String)
+    end
+  end
 end
