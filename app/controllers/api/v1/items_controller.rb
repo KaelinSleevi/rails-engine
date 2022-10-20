@@ -5,8 +5,11 @@ class Api::V1::ItemsController < ApplicationController
  end
 
  def show
-  item = Item.find(params[:id])
-  render json: ItemSerializer.new(item)
+   if Item.exists?(params[:id])
+    render json: ItemSerializer.new(Item.find(params[:id]))
+   else 
+    render json: ItemSerializer.no_item, status: 404
+   end
  end
 
  def create
@@ -20,10 +23,13 @@ class Api::V1::ItemsController < ApplicationController
  end
 
  def update
-  item = Item.update(params[:id], item_params)
-  
-  if item.save
-   render json: ItemSerializer.new(item)
+  if Item.exists?(params[:id])
+   item = Item.find(params[:id])
+   if item.update(item_params)
+    render json: ItemSerializer.new(item)
+   else 
+    render status: 400
+   end
   else
    render status: 404
   end

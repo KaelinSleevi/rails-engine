@@ -34,6 +34,17 @@ describe "Items API" do
     end
   end
 
+  it "always return an array of data, even if one or zero resources are found" do
+    get '/api/v1/items'
+
+    expect(response).to be_successful
+
+    items = JSON.parse(response.body, symbolize_names: true)
+
+    expect(items[:data].count).to eq(0)
+    expect(items[:data]).to eq([])
+  end
+
   it "can get one items by its id" do
     id = create(:item).id
 
@@ -64,6 +75,22 @@ describe "Items API" do
     expect(item[:data][:attributes][:unit_price]).to be_a(Float)
   end
 
+  it "If the user causes an error it sends a status and error message" do
+    get "/api/v1/items/314159265359"
+ 
+    item = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.successful?).to eq(false)
+    
+    expect(response.status).to eq(404)
+
+    expect(item[:data]).to have_key(:id)
+    expect(item[:data][:id]).to eq(nil)
+
+    expect(item[:data]).to have_key(:type)
+    expect(item[:data][:type]).to be_a(String)
+  end
+
   it "can create a new item" do
    merchant = create(:merchant)
 
@@ -87,6 +114,23 @@ describe "Items API" do
    expect(created_item.merchant_id).to eq(item_params[:merchant_id])
  end
 
+ it "return an error if any attribute of that item is missing" do
+  merchant = create(:merchant)
+
+  item_params = ({
+                  name: 'Leaf Earrings',
+                  unit_price: 124.96,
+                  merchant_id: merchant.id
+                })
+  headers = {"CONTENT_TYPE" => "application/json"}
+
+  post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
+
+  expect(response.successful?).to eq(false)
+    
+  expect(response.status).to eq(404)
+ end
+
  it 'can delete an item' do
   merchant = create(:merchant)
   item = create(:item)
@@ -94,9 +138,11 @@ describe "Items API" do
   expect(Item.count).to eq(1)
 
   delete "/api/v1/items/#{item.id}"
-
+ 
   expect(response).to be_successful
   expect(Item.count).to eq(0)
+  expect(response.status).to eq(204)
+  expect(response.body).to eq("")
   expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
  end
 
@@ -115,6 +161,47 @@ describe "Items API" do
   expect(response).to be_successful
   expect(item.name).to_not eq(previous_name)
   expect(item.name).to eq("Silver Ting")
+ end
+
+ it "can not update without a valid id" do
+  merchant = create(:merchant)
+
+  item_params = { name: "Silver Ting" }
+  headers = {"CONTENT_TYPE" => "application/json"}
+
+  patch "/api/v1/items/93947", headers: headers, params: JSON.generate({item: item_params})
+
+  expect(response.successful?).to eq(false)
+  expect(response.status).to eq(404)
+ end
+
+ it "can not update without a valid merchant_id" do
+  id = create(:item).id
+
+  item_params = { merchant_id: 67594}
+  headers = {"CONTENT_TYPE" => "application/json"}
+
+  patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+  item = Item.find_by(id: id)
+ 
+  expect(response.successful?).to eq(false)
+  expect(response.status).to eq(400)
+ end
+
+ it "can not update without a valid entry (name, description)" do
+  merchant = create(:merchant)
+  id = create(:item).id
+
+  previous_name = Item.last.name
+
+  item_params = { name: " " }
+  headers = {"CONTENT_TYPE" => "application/json"}
+
+  patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate({item: item_params})
+  item = Item.find_by(id: id)
+
+  expect(response.successful?).to eq(false)
+  expect(response.status).to eq(400)
  end
 
  it "sends a list of the item and all its merchants" do

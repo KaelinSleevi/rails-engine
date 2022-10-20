@@ -25,6 +25,17 @@ describe "Merchants API" do
     end
   end
 
+  it "always return an array of data, even if one or zero resources are found" do
+    get '/api/v1/merchants'
+
+    expect(response).to be_successful
+
+    merchants = JSON.parse(response.body, symbolize_names: true)
+
+    expect(merchants[:data].count).to eq(0)
+    expect(merchants[:data]).to eq([])
+  end
+
   it "can get one merchant by its id" do
     id = create(:merchant).id
   
@@ -41,6 +52,22 @@ describe "Merchants API" do
 
     expect(merchant[:data][:attributes]).to have_key(:name)
     expect(merchant[:data][:attributes][:name]).to be_a(String)
+
+    expect(merchant[:data]).to have_key(:type)
+    expect(merchant[:data][:type]).to be_a(String)
+  end
+
+  it "If the user causes an error it sends a status and error message" do
+    get "/api/v1/merchants/39792"
+ 
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.successful?).to eq(false)
+    
+    expect(response.status).to eq(404)
+
+    expect(merchant[:data]).to have_key(:id)
+    expect(merchant[:data][:id]).to eq(nil)
 
     expect(merchant[:data]).to have_key(:type)
     expect(merchant[:data][:type]).to be_a(String)
