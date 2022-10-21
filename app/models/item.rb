@@ -10,9 +10,17 @@ class Item < ApplicationRecord
 
  before_destroy :delete_invoices, prepend: true
 
- def self.search_by_name(search)
-  where("name ILIKE ?", "%#{search}%").order(:name)
- end
+  def self.search_by_name(search)
+    where("name ILIKE ?", "%#{search}%").order(:name)
+  end
+
+  def self.search_by_min_price(price)
+    where("unit_price >= ?", price).order(:name)
+  end
+
+  def self.search_by_max_price(price)
+    where("unit_price <= ?", price).order(:name)
+  end
 
  private
 

@@ -303,4 +303,32 @@ describe "Items API" do
       expect(data[:type]).to be_a(String)
     end
   end
+
+  it 'finds all items by search criteria(max_price)' do
+    merchant = create(:merchant)
+    item1 = merchant.items.create!(name: "Boba Statue", description: "Lorem ipsum", unit_price: 123)
+    item2 = merchant.items.create!(name: "Bro Cap", description: "We love it", unit_price: 289)
+    item3 = merchant.items.create!(name: "This is an item", description: "No cap", unit_price: 356)
+    item4 = merchant.items.create!(name: "I swear", description: "I did swear, it means I promise", unit_price: 334)
+
+    get "/api/v1/items/find_all?max_price=300"
+
+    items_list = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(200)
+  end
+
+  it 'finds all items by search criteria(min_price)' do
+    merchant = create(:merchant)
+    item1 = merchant.items.create!(name: "Boba Statue", description: "Lorem ipsum", unit_price: 123)
+    item2 = merchant.items.create!(name: "Bro Cap", description: "We love it", unit_price: 289)
+    item3 = merchant.items.create!(name: "This is an item", description: "No cap", unit_price: 356)
+    item4 = merchant.items.create!(name: "I swear", description: "I did swear, it means I promise", unit_price: 334)
+
+    get "/api/v1/items/find_all?min_price=150"
+
+    items_list = JSON.parse(response.body, symbolize_names: true)
+    
+    expect(response.status).to eq(200)
+  end
 end
