@@ -125,7 +125,7 @@ describe "Items API" do
   headers = {"CONTENT_TYPE" => "application/json"}
 
   post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
-
+  
   expect(response.successful?).to eq(false)
     
   expect(response.status).to eq(404)
@@ -144,6 +144,30 @@ describe "Items API" do
   expect(response.status).to eq(204)
   expect(response.body).to eq("")
   expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+ end
+
+ it 'can delete the invoice if the associated item is the only existing item' do
+  merchant = create(:merchant)
+
+  item1 = create(:item)
+  item2 = create(:item)
+
+  invoice1 = create(:invoice)
+  invoice2 = create(:invoice)
+
+  invoice_item1 = InvoiceItem.create!(item_id: item1.id, invoice_id: invoice1.id, unit_price: item1.unit_price, quantity: 12)
+  invoice_item2 = InvoiceItem.create!(item_id: item1.id, invoice_id: invoice2.id, unit_price: item1.unit_price, quantity: 2938)
+  invoice_item3 = InvoiceItem.create!(item_id: item2.id, invoice_id: invoice2.id, unit_price: item2.unit_price, quantity: 3343)
+
+  expect(Item.count).to eq(2)
+  expect(Invoice.count).to eq(2)
+
+  expect{ delete "/api/v1/items/#{item1.id}" }.to change(Item, :count).by(-1)
+
+  expect(invoice1.items).to eq([])
+
+  expect{Item.find(item1.id)}.to raise_error(ActiveRecord::RecordNotFound)
+  expect{Invoice.find(invoice1.id)}.to raise_error(ActiveRecord::RecordNotFound)
  end
 
  it 'can update an item' do
@@ -213,7 +237,7 @@ describe "Items API" do
     get "/api/v1/items/#{item.id}/merchant"
 
     expect(response).to be_successful
-
+    
     merchants = JSON.parse(response.body, symbolize_names: true)
 
     expect(merchants[:data].count).to eq(3)
