@@ -10,6 +10,10 @@ class Item < ApplicationRecord
 
  before_destroy :delete_invoices, prepend: true
 
+ def self.search_by_name(search)
+  where("name ILIKE ?", "%#{search}%").order(:name)
+ end
+
  private
 
   def delete_invoices

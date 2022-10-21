@@ -254,15 +254,53 @@ describe "Items API" do
 
   it "finds all items by search criteria" do
     merchant = create(:merchant)
-    item1 = Item.create!(name: "Boba Statue", description: "Lorem ipsum", unit_price: 1)
-    item2 = Item.create!(name: "Bro Cap", description: "We love it", unit_price: 2)
-    item3 = Item.create!(name: "This is an item", description: "No cap", unit_price: 3)
-    item4 = Item.create!(name: "I swear", description: "I did swear, it means I promise", unit_price: 3)
+    item1 = merchant.items.create!(name: "Boba Statue", description: "Lorem ipsum", unit_price: 1)
+    item2 = merchant.items.create!(name: "Bro Cap", description: "We love it", unit_price: 2)
+    item3 = merchant.items.create!(name: "This is an item", description: "No cap", unit_price: 3)
+    item4 = merchant.items.create!(name: "I swear", description: "I did swear, it means I promise", unit_price: 3)
 
-    get "/api/v1/items/find?name=ca"
+    get "/api/v1/items/find_all?name=a"
 
     items_list = JSON.parse(response.body, symbolize_names: true)
 
     expect(response.status).to eq(200)
+   
+    items_list[:data].each do |data|
+      expect(data[:attributes]).to have_key(:name)
+      expect(data[:attributes][:name]).to be_a(String)
+  
+      expect(data[:attributes]).to have_key(:description)
+      expect(data[:attributes][:description]).to be_a(String)
+  
+      expect(data).to have_key(:id)
+      expect(data[:id]).to be_a(String)
+  
+      expect(data).to have_key(:type)
+      expect(data[:type]).to be_a(String)
+    end
+  end
+
+  it 'will not find items without the correct search criteria' do
+    merchant = create(:merchant)
+    item1 = merchant.items.create!(name: "Boba Statue", description: "Lorem ipsum", unit_price: 1)
+    item2 = merchant.items.create!(name: "Bro Cap", description: "We love it", unit_price: 2)
+    item3 = merchant.items.create!(name: "This is an item", description: "No cap", unit_price: 3)
+    item4 = merchant.items.create!(name: "I swear", description: "I did swear, it means I promise", unit_price: 3)
+
+    get "/api/v1/items/find_all?name=Z"
+
+    items_list = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(200)
+
+    expect(items_list[:data]).to eq([])
+
+    items_list[:data].each do |data|
+      expect(data).to have_key(:id)
+      expect(data[:id]).to be_a(String)
+  
+      expect(data).to have_key(:type)
+      expect(data[:type]).to be_a(String)
+    end
   end
 end
