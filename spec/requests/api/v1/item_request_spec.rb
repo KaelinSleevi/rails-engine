@@ -251,4 +251,18 @@ describe "Items API" do
     expect(merchants[:data]).to have_key(:type)
     expect(merchants[:data][:type]).to be_a(String)
   end
+
+  it "finds all items by search criteria" do
+    merchant = create(:merchant)
+    item1 = Item.create!(name: "Boba Statue", description: "Lorem ipsum", unit_price: 1)
+    item2 = Item.create!(name: "Bro Cap", description: "We love it", unit_price: 2)
+    item3 = Item.create!(name: "This is an item", description: "No cap", unit_price: 3)
+    item4 = Item.create!(name: "I swear", description: "I did swear, it means I promise", unit_price: 3)
+
+    get "/api/v1/items/find?name=ca"
+
+    items_list = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(200)
+  end
 end

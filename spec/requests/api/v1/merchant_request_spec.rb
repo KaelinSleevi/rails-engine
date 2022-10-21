@@ -126,11 +126,9 @@ describe "Merchants API" do
     merchant_1 = Merchant.create!(name: "Kaelin")
     merchant_2 = Merchant.create!(name: "Elizabeth")
 
-    get "/api/v1/merchants/search?name=Tre"
+    get "/api/v1/merchants/search?name="
 
     merchant = JSON.parse(response.body, symbolize_names: true)
-
-    expect(response.status).to eq(404)
 
     expect(merchant[:data]).to have_key(:id)
     expect(merchant[:data][:id]).to eq(nil)
