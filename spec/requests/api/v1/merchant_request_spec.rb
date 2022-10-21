@@ -108,4 +108,34 @@ describe "Merchants API" do
       expect(data[:type]).to be_a(String)
     end
   end
+
+  it "finds one merchant by search criteria" do
+    merchant_1 = Merchant.create!(name: "Kaelin")
+    merchant_2 = Merchant.create!(name: "Elizabeth")
+
+    get "/api/v1/merchants/find?name=Kae"
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(200)
+
+    expect(Merchant.search_for("Kae")).to eq(merchant_1)
+  end
+
+  it "returns null object if no match" do
+    merchant_1 = Merchant.create!(name: "Kaelin")
+    merchant_2 = Merchant.create!(name: "Elizabeth")
+
+    get "/api/v1/merchants/search?name=Tre"
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(response.status).to eq(404)
+
+    expect(merchant[:data]).to have_key(:id)
+    expect(merchant[:data][:id]).to eq(nil)
+
+    expect(merchant[:data]).to have_key(:type)
+    expect(merchant[:data][:type]).to be_a(String)
+  end
 end
